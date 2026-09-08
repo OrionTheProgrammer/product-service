@@ -25,6 +25,25 @@ public class ProductDbContext : DbContext
             category.Property(c => c.OriginalValue);
         });
         product.Property(p => p.ProductPrice).IsRequired();
-        product.Property(p => p.ProductSizes).IsRequired();
+        product.OwnsOne(p => p.ProductSizes, sizes =>
+        {
+            sizes.Property(s => s.XS)
+            .HasColumnName("XS");
+
+            sizes.Property(s => s.S)
+            .HasColumnName("S");
+
+            sizes.Property(s => s.M)
+            .HasColumnName("M");
+
+            sizes.Property(s => s.L)
+            .HasColumnName("L");
+
+            sizes.Property(s => s.XL)
+            .HasColumnName("XL");
+
+            sizes.Property(s => s.XXL)
+            .HasColumnName("XXL");
+        });
     }
 }
