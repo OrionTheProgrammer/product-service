@@ -25,7 +25,7 @@ public class ProductController : ControllerBase
         return Ok(await _service.GetAllProductsAsync());
     }
 
-    [HttpGet("/{id:int}")]
+    [HttpGet("{id:int}")]
     [MapToApiVersion("1.0")]
     public async Task<ActionResult<ProductResponse>> GetProductById(int id)
     {
@@ -37,7 +37,7 @@ public class ProductController : ControllerBase
         };
     }
 
-    [HttpGet("/{category:string}")]
+    [HttpGet("by-category/{category}")]
     [MapToApiVersion("1.0")]
     public async Task<ActionResult<ProductResponse>> GetProductsByCategory(string category)
     {
@@ -50,7 +50,7 @@ public class ProductController : ControllerBase
         };
     }
 
-    [HttpGet("/{price:int}")]
+    [HttpGet("by-price/{price:int}")]
     [MapToApiVersion("1.0")]
     public async Task<ActionResult<ProductResponse>> GetProductsByPrice(int price)
     {
@@ -83,7 +83,7 @@ public class ProductController : ControllerBase
         };
     }
 
-    [HttpDelete("/{id:int}")]
+    [HttpDelete("{id:int}")]
     [MapToApiVersion("1.0")]
     public async Task<ActionResult> DeleteProductById(int id)
     {
