@@ -51,6 +51,13 @@ public class Category
         OriginalValue = originalValue;
     }
 
+    public Category(string value)
+    {
+        var resultado = Constructor(value);
+        Type = resultado.Item1;
+        OriginalValue = resultado.Item2;
+    }
+
     public string GetStringValue()
     {
         return $"{Type}";
@@ -72,6 +79,24 @@ public class Category
 
         return new Category(CategoryType.Unknown, value);
     }
+
+    private static (CategoryType, string) Constructor(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return (CategoryType.Unknown, value);
+        }
+
+        string normalized = Normalize(value);
+
+        if (Aliases.TryGetValue(normalized, out CategoryType type))
+        {
+            return (type, value);
+        }
+
+        return (CategoryType.Unknown, value);
+    }
+
 
     private static string Normalize(string value)
     {

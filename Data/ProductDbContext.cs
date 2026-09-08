@@ -19,7 +19,11 @@ public class ProductDbContext : DbContext
         product.HasKey(p => p.ProductId);
         product.Property(p => p.ProductName).IsRequired().HasMaxLength(120);
         product.Property(p => p.ProductBrand).IsRequired().HasMaxLength(120);
-        product.Property(p => p.ProductCategory).IsRequired();
+        product.ComplexProperty(p => p.ProductCategory, category =>
+        {
+            category.Property(c => c.Type).HasConversion<string>();
+            category.Property(c => c.OriginalValue);
+        });
         product.Property(p => p.ProductPrice).IsRequired();
         product.Property(p => p.ProductSizes).IsRequired();
     }
