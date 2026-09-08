@@ -55,6 +55,8 @@ public class SqliteProductRepository : IProductRepository
             return false;
         }
 
+        _context.Products.Remove(product);
+        await _context.SaveChangesAsync();
         return true;
     }
 

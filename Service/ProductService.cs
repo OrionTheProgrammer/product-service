@@ -55,7 +55,7 @@ public class ProductService
         ProductEntity? entity = await _repository.GetProductByIdAsync(product.ProductId);
 
         if (product == null) { return false; }
-        await _repository.UpdateProductAsync(entity!);
+        await _repository.UpdateProductAsync(entity);
         return true;
     }
 
