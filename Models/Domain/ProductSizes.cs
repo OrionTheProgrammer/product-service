@@ -3,10 +3,26 @@ namespace Product_Service.Models.Domain;
 
 public class ProductSizes
 {
-    public Dictionary<Size, bool> Sizes { get; } = null!;
+    public bool XS { get; set; }
+    public bool S { get; set; }
+    public bool M { get; set; }
+    public bool L { get; set; }
+    public bool XL { get; set; }
+    public bool XXL { get; set; }
 
-    public ProductSizes(Dictionary<Size, bool> sizes)
+
+    public bool IsAvailable(Size size)
     {
-        Sizes = sizes;
+        return size switch
+        {
+            Size.XS => XS,
+            Size.S => S,
+            Size.M => M,
+            Size.L => L,
+            Size.XL => XL,
+            Size.XXL => XXL,
+            _ => throw new NotImplementedException()
+        };
     }
+
 }
