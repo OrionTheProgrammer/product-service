@@ -11,5 +11,6 @@ public class ProductEntity
     public Category ProductCategory { get; set; } = null!;
     public int ProductPrice { get; set; }
     public ProductSizes ProductSizes { get; set; } = null!;
+    public string ProductSlug { get; set; } = null!;
 
 }

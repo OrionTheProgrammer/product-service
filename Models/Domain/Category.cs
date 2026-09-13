@@ -7,7 +7,11 @@ public class Category
 {
     public CategoryType Type { get; }
 
-    public string OriginalValue { get; }
+    public string OriginalValue
+    {
+        get => Type.ToString();
+        set => OriginalValue = value;
+    }
 
     private static readonly Dictionary<string, CategoryType> Aliases =
         new(StringComparer.OrdinalIgnoreCase)

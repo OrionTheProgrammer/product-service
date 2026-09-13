@@ -4,6 +4,7 @@ using Product_Service.Data;
 using Microsoft.EntityFrameworkCore;
 using Product_Service.Repository;
 using Product_Service.Service;
+using Product_Service.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,19 +24,37 @@ builder.Services.AddApiVersioning(options =>
     options.AssumeDefaultVersionWhenUnspecified = true;
     options.ReportApiVersions = true;
     options.ApiVersionReader = new HeaderApiVersionReader("Version");
-}).AddMvc();
+}).AddMvc(options =>
+{
+    options.Conventions
+        .Controller<ProductController>()
+        .HasApiVersion(new(1, 0));
+    options.Conventions
+        .Controller<ProductController>()
+        .HasApiVersion(new(2, 0));
+}).AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+}).AddOpenApi();
 
 builder.Services.AddControllers();
-
-builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-    app.MapScalarApiReference();
+    app.MapOpenApi().WithDocumentPerVersion();
+
+    app.MapScalarApiReference(options =>
+    {
+        foreach (var version in app.DescribeApiVersions())
+        {
+            options.AddDocument(
+                version.GroupName,
+                $"Productos {version.GroupName}");
+        }
+    });
 }
 
 app.UseHttpsRedirection();

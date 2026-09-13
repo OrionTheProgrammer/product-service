@@ -31,6 +31,15 @@ public class ProductService
         return product.ToResponse();
     }
 
+    public async Task<ProductResponse?> GetProductBySlugAsync(string slug)
+    {
+        ProductEntity? product = await _repository.GetProductBySlugAsync(slug);
+
+        if (product == null) { return null; }
+
+        return product.ToResponse();
+    }
+
     public async Task<ProductResponse> CreateProductAsync(ProductRequest request)
     {
         Product productModel = new(
@@ -43,20 +52,19 @@ public class ProductService
             ProductBrand = productModel.ProductBrand,
             ProductCategory = Category.From(productModel.ProductCategory),
             ProductPrice = productModel.ProductPrice,
-            ProductSizes = productModel.ProductSizes
+            ProductSizes = productModel.ProductSizes,
+            ProductSlug = productModel.ProductName.GenerateSlugFrom()
         };
 
         ProductEntity saved = await _repository.AddProductAsync(productEntity);
         return saved.ToResponse();
     }
 
-    public async Task<bool> UpdateProductAsync(ProductEntity product)
+    public async Task<ProductResponse?> UpdateProductAsync(int id, ProductRequest product)
     {
-        ProductEntity? entity = await _repository.GetProductByIdAsync(product.ProductId);
+        ProductEntity? newProduct = await _repository.UpdateProductAsync(id, product);
 
-        if (product == null) { return false; }
-        await _repository.UpdateProductAsync(entity);
-        return true;
+        return newProduct?.ToResponse();
     }
 
     public async Task<bool> DeleteProductById(int id)

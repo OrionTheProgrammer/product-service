@@ -45,5 +45,7 @@ public class ProductDbContext : DbContext
             sizes.Property(s => s.XXL)
             .HasColumnName("XXL");
         });
+        product.HasIndex(p => p.ProductSlug).IsUnique();
+
     }
 }

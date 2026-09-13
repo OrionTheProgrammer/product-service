@@ -41,11 +41,13 @@ public class Product
     public Product(string name, string brand, string category, int price, ProductSizes sizes)
     {
         ProductName = name;
-        ProductBrand = name;
+        ProductBrand = brand;
         ProductCategory = category;
         ProductPrice = price;
         ProductSizes = sizes;
     }
+
+    public Product() { }
 
 
     private static string StringValidator(string value)

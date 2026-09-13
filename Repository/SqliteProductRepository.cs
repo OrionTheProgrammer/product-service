@@ -1,9 +1,12 @@
 using System.Reflection.Metadata;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Product_Service.Data;
 using Product_Service.Exceptions;
 using Product_Service.Models.Domain;
+using Product_Service.Models.DTOs;
 using Product_Service.Models.Entities;
+using Product_Service.Models.Mappers;
 
 namespace Product_Service.Repository;
 
@@ -32,6 +35,13 @@ public class SqliteProductRepository : IProductRepository
             .SingleOrDefaultAsync(p => p.ProductId == id);
     }
 
+    public async Task<ProductEntity?> GetProductBySlugAsync(string slug)
+    {
+        return await _context.Products
+            .AsNoTracking()
+            .SingleOrDefaultAsync(p => p.ProductSlug == slug);
+    }
+
     public async Task<ProductEntity> AddProductAsync(ProductEntity product)
     {
         _context.Products.Add(product);
@@ -40,10 +50,24 @@ public class SqliteProductRepository : IProductRepository
         return product;
     }
 
-    public async Task UpdateProductAsync(ProductEntity product)
+    public async Task<ProductEntity?> UpdateProductAsync(int id, ProductRequest product)
     {
-        _context.Products.Update(product);
+        ProductEntity? oldProduct = await _context.Products.SingleOrDefaultAsync(p => p.ProductId == id);
+        Product? modelProduct = product.ToModel();
+
+        if (oldProduct == null || modelProduct == null) { return null; }
+
+        ProductEntity newData = modelProduct.ToEntity();
+
+        oldProduct.ProductName = newData.ProductName;
+        oldProduct.ProductBrand = newData.ProductBrand;
+        oldProduct.ProductCategory = newData.ProductCategory;
+        oldProduct.ProductPrice = newData.ProductPrice;
+        oldProduct.ProductSizes = newData.ProductSizes;
+
         await _context.SaveChangesAsync();
+        return oldProduct;
+
     }
 
     public async Task<bool> DeleteProductByIdAsync(int id)
