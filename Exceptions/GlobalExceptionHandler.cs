@@ -38,6 +38,18 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
                 "Conflicto de producto",
                 exception.Message
             ),
+            SizeValueException =>
+            (
+                StatusCodes.Status400BadRequest,
+                "Valor de la talla invalido",
+                exception.Message
+            ),
+            CategoryValueException =>
+            (
+                StatusCodes.Status400BadRequest,
+                "La categoria ingresada no es valida",
+                exception.Message
+            ),
             ArgumentException =>
             (
                 StatusCodes.Status400BadRequest,
@@ -55,6 +67,7 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
         int statusCode = error.Item1;
         string title = error.Item2;
         string detail = error.Item3;
+        string traceId = httpContext.TraceIdentifier;
 
         httpContext.Response.StatusCode = statusCode;
 
@@ -66,11 +79,18 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
             Instance = httpContext.Request.Path
         };
 
+        problem.Extensions["traceId"] = traceId;
+
         if (statusCode >= 500)
         {
             _logger.LogError(
                 exception,
-                "Error inesperado, procesando {Path}",
+                "Error inesperado, procesando. "
+                + "TraceId {traceId}"
+                + "Metodo {method}"
+                + "Path {path}",
+                traceId,
+                httpContext.Request.Method,
                 httpContext.Request.Path
             );
         }

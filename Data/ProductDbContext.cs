@@ -1,3 +1,5 @@
+using System.Drawing;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Product_Service.Models.Entities;
 
@@ -27,23 +29,17 @@ public class ProductDbContext : DbContext
         product.Property(p => p.ProductPrice).IsRequired();
         product.OwnsOne(p => p.ProductSizes, sizes =>
         {
-            sizes.Property(s => s.XS)
-            .HasColumnName("XS");
-
-            sizes.Property(s => s.S)
-            .HasColumnName("S");
-
-            sizes.Property(s => s.M)
-            .HasColumnName("M");
-
-            sizes.Property(s => s.L)
-            .HasColumnName("L");
-
-            sizes.Property(s => s.XL)
-            .HasColumnName("XL");
-
-            sizes.Property(s => s.XXL)
-            .HasColumnName("XXL");
+            sizes.Property(s => s.Tallas)
+                .HasConversion
+                (
+                    tallas => JsonSerializer.Serialize(tallas, (JsonSerializerOptions?)null),
+                    json => string.IsNullOrWhiteSpace(json)
+                        ? new List<string>()
+                        : JsonSerializer.Deserialize<List<string>>(
+                            json,
+                            (JsonSerializerOptions?)null
+                        ) ?? new List<string>()
+                );
         });
         product.HasIndex(p => p.ProductSlug).IsUnique();
 

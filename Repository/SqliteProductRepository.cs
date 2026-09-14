@@ -100,7 +100,7 @@ public class SqliteProductRepository : IProductRepository
     {
         if (string.IsNullOrWhiteSpace(category))
         {
-            throw new ArgumentException("La categoria escrita no puede ser null o estar vacia.");
+            throw new CategoryValueException("La categoria escrita no puede ser null o estar vacia.");
         }
 
         return await _context.Products
@@ -125,35 +125,7 @@ public class SqliteProductRepository : IProductRepository
 
     public async Task<IReadOnlyList<ProductEntity>> GetProductsBySizeAsync(string size)
     {
-        if (string.IsNullOrWhiteSpace(size))
-        {
-            throw new ArgumentException(
-                "La talla de filtrado no puede ser null ni estar vacía."
-            );
-        }
-
-        if (!Enum.TryParse<Size>(size, true, out var parsedSize))
-        {
-            throw new ArgumentException(
-                $"La talla '{size}' no es válida."
-            );
-        }
-
-        IQueryable<ProductEntity> query =
-            _context.Products.AsNoTracking();
-
-        query = parsedSize switch
-        {
-            Size.XS => query.Where(p => p.ProductSizes.XS),
-            Size.S => query.Where(p => p.ProductSizes.S),
-            Size.M => query.Where(p => p.ProductSizes.M),
-            Size.L => query.Where(p => p.ProductSizes.L),
-            Size.XL => query.Where(p => p.ProductSizes.XL),
-            Size.XXL => query.Where(p => p.ProductSizes.XXL),
-
-            _ => throw new ArgumentException("Talla no soportada.")
-        };
-
-        return await query.ToListAsync();
+        return await _context.Products.AsNoTracking()
+            .Where(p => p.ProductSizes.Tallas.Contains(size.Trim().ToUpper())).ToListAsync();
     }
 }

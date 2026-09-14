@@ -40,7 +40,12 @@ builder.Services.AddApiVersioning(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-builder.Services.AddProblemDetails();
+builder.Services.AddProblemDetails(options =>
+{
+    options.CustomizeProblemDetails = context => context.ProblemDetails
+        .Extensions["traceId"] =
+        context.HttpContext.TraceIdentifier;
+});
 
 var app = builder.Build();
 

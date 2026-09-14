@@ -11,10 +11,12 @@ namespace Product_Service.Service;
 public class ProductService
 {
     private readonly IProductRepository _repository;
+    private readonly ILogger<ProductService> _logger;
 
-    public ProductService(IProductRepository repository)
+    public ProductService(IProductRepository repository, ILogger<ProductService> logger)
     {
         _repository = repository;
+        _logger = logger;
     }
 
     public async Task<IReadOnlyList<ProductResponse>> GetAllProductsAsync()
@@ -40,6 +42,8 @@ public class ProductService
         Product productModel = new(
             request.Name, request.Brand, request.Category, request.Price, request.Sizes
         );
+
+        _logger.LogInformation("Creando producto, nombre base: {ProductName}", request.Name);
 
         ProductEntity productEntity = new()
         {
@@ -69,6 +73,7 @@ public class ProductService
     public async Task<IReadOnlyList<ProductResponse>> GetProductsByCategoryAsync(string category)
     {
         var products = await _repository.GetProductsByCategoryAsync(category);
+        if (products == null) { throw new CategoryValueException($"Categoria ingresada no valida. {category}"); }
 
         return products.Select(p => p.ToResponse()).ToList();
     }
