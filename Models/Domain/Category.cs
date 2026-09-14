@@ -10,7 +10,6 @@ public class Category
     public string OriginalValue
     {
         get => Type.ToString();
-        set => OriginalValue = value;
     }
 
     private static readonly Dictionary<string, CategoryType> Aliases =
@@ -52,14 +51,12 @@ public class Category
     private Category(CategoryType type, string originalValue)
     {
         Type = type;
-        OriginalValue = originalValue;
     }
 
     public Category(string value)
     {
         var resultado = Constructor(value);
         Type = resultado.Item1;
-        OriginalValue = resultado.Item2;
     }
 
     public string GetStringValue()
