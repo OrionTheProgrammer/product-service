@@ -1,3 +1,4 @@
+using Product_Service.Exceptions;
 using Product_Service.Models.Domain;
 using Product_Service.Models.DTOs;
 using Product_Service.Models.Entities;
@@ -22,21 +23,15 @@ public class ProductService
         return products.Select(p => p.ToResponse()).ToList();
     }
 
-    public async Task<ProductResponse?> GetProductByIdAsync(int id)
+    public async Task<ProductResponse> GetProductByIdAsync(int id)
     {
-        ProductEntity? product = await _repository.GetProductByIdAsync(id);
-
-        if (product == null) { return null; }
-
+        ProductEntity? product = await _repository.GetProductByIdAsync(id) ?? throw new ProductNotFoundException(id);
         return product.ToResponse();
     }
 
-    public async Task<ProductResponse?> GetProductBySlugAsync(string slug)
+    public async Task<ProductResponse> GetProductBySlugAsync(string slug)
     {
-        ProductEntity? product = await _repository.GetProductBySlugAsync(slug);
-
-        if (product == null) { return null; }
-
+        ProductEntity? product = await _repository.GetProductBySlugAsync(slug) ?? throw new ProductNotFoundException($"No se encontro ningun producto relacionado a {slug}");
         return product.ToResponse();
     }
 
@@ -60,11 +55,10 @@ public class ProductService
         return saved.ToResponse();
     }
 
-    public async Task<ProductResponse?> UpdateProductAsync(int id, ProductRequest product)
+    public async Task<ProductResponse> UpdateProductAsync(int id, ProductRequest product)
     {
-        ProductEntity? newProduct = await _repository.UpdateProductAsync(id, product);
-
-        return newProduct?.ToResponse();
+        ProductEntity? newProduct = await _repository.UpdateProductAsync(id, product) ?? throw new ProductNotFoundException($"No se pudo actualizar el producto, no existe con el ID {id}");
+        return newProduct.ToResponse();
     }
 
     public async Task<bool> DeleteProductById(int id)

@@ -1,6 +1,5 @@
-using System.Reflection.Metadata;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Product_Service.Data;
 using Product_Service.Exceptions;
 using Product_Service.Models.Domain;
@@ -44,10 +43,23 @@ public class SqliteProductRepository : IProductRepository
 
     public async Task<ProductEntity> AddProductAsync(ProductEntity product)
     {
-        _context.Products.Add(product);
-        await _context.SaveChangesAsync();
+        try
+        {
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
 
-        return product;
+            return product;
+        }
+        catch (DbUpdateException ex)
+            when (
+                ex.InnerException is SqliteException sqlite && sqlite.SqliteErrorCode == 19
+            )
+        {
+            throw new ProductConflictException("No fue posible guardar el producto porque entra en conflicto con datos existentes.", ex);
+        }
+        ;
+
+
     }
 
     public async Task<ProductEntity?> UpdateProductAsync(int id, ProductRequest product)

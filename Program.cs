@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Product_Service.Repository;
 using Product_Service.Service;
 using Product_Service.Controllers;
+using Product_Service.Exceptions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,8 +39,12 @@ builder.Services.AddApiVersioning(options =>
 }).AddOpenApi();
 
 builder.Services.AddControllers();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

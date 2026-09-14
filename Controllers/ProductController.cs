@@ -28,12 +28,7 @@ public class ProductController : ControllerBase
     [MapToApiVersion("1.0")]
     public async Task<ActionResult<ProductResponse>> GetProductById(int id)
     {
-        ProductResponse? response = await _service.GetProductByIdAsync(id);
-        return response switch
-        {
-            null => NotFound(),
-            _ => Ok(response)
-        };
+        return Ok(await _service.GetProductByIdAsync(id));
     }
 
     [HttpGet("{id:int}")]
@@ -41,8 +36,6 @@ public class ProductController : ControllerBase
     public async Task<ActionResult> GetProductByIdV2(int id)
     {
         ProductResponse? response = await _service.GetProductByIdAsync(id);
-        if (response == null) { return NotFound(); }
-
         return RedirectToAction(nameof(GetByIdWhitSlug), new { slug = response.Name.GenerateSlugFrom() });
     }
 
@@ -97,25 +90,15 @@ public class ProductController : ControllerBase
     [MapToApiVersion("1.0")]
     public async Task<ActionResult<ProductResponse>> UpdateProduct(int id, ProductRequest request)
     {
-        ProductResponse? product = await _service.UpdateProductAsync(id, request);
-
-        return product switch
-        {
-            null => BadRequest(),
-            _ => Ok(product)
-        };
+        return Ok(await _service.UpdateProductAsync(id, request));
     }
 
     [HttpDelete("{id:int}")]
     [MapToApiVersion("1.0")]
     public async Task<ActionResult> DeleteProductById(int id)
     {
-        bool isDeleted = await _service.DeleteProductById(id);
-        return isDeleted switch
-        {
-            false => NotFound(),
-            true => NoContent()
-        };
+        await _service.DeleteProductById(id);
+        return NoContent();
     }
 
 }
